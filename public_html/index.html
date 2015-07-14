@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>AngularJS:ToDo管理</title>
+        <meta charset="UTF-8">
+        
+        <!-- 共通ヘッダ -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="vendors/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="vendors/angular.js"></script>
+        <script type="text/javascript" src="vendors/bootstrap/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="vendors/bootstrap/css/bootstrap-theme.min.css">
+        
+        <!-- 今回のサンプルコード -->
+        <script type="text/javascript" src="js/app.js"></script>
+        <script type="text/javascript" src="js/controller.js"></script>
+        
+    </head>
+    <body ng-app="todoModule" ng-controller="pageController">
+        <!-- ヘッダ部分 -->
+        <!-- タスク一覧画面 -->
+        <div class="container" ng-show="show.list">
+            <div ng-controller="listController">
+                <div class="list-group">
+                    <a class="list-group-item" ng-repeat="item in items">
+                        <div>
+                            <h4 class="list-group-item-heading">{{item.title}}</h4>
+                            <p class="list-group-item-text">{{item.memo}}</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- タスク追加画面 -->
+        <div ng-show="show.add"></div>
+        <!-- タスク参照画面 -->
+        <div ng-show="show.info"></div>
+        <!-- フッタ部分 -->
+        <nav>
+            <div>
+                <a class="btn btn-default" ng-click="changePage('add')">新規</a>
+                <a class="btn btn-default" ng-click="changePage('list')">一覧</a>
+            </div>
+        </nav>
+    </body>
+</html>
