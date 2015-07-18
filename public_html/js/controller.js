@@ -4,11 +4,12 @@
  * and open the template in the editor.
  */
 
-http://codezine.jp/article/detail/8311
-
 (function(module) {
     'use strict';       // Strictモードを指定
     
+    /***************************************************************************
+     *  pageController
+     **************************************************************************/
     module.controller('pageController', function($scope) {
        // 表示する要素の管理
        $scope.show = {
@@ -35,19 +36,34 @@ http://codezine.jp/article/detail/8311
            }
        };
        
+       // タスクの削除
        $scope.deleteItem = function(item) {
            $scope.showMessage({
                 type : 'alert-warning',
                 text : '削除しました',
                 show : true
             });
+            // rootScopeからのイベント通知
             $scope.$root.$boroadcast('changeItems');
+            // 一覧の表示(画面遷移)
             $scope.changePage('list');
        };
        
-    });
+       // メッセージ表示
+       $scope.showMessage = function(msg) {
+           $scope.message = msg;
+           // 3秒後にメッセージを非表示にする
+           $timeout(function(){
+               $scope.message = false;
+           }, 3000);
+       };
+    }); //pageController
 
+    /***************************************************************************
+     *  listController
+     **************************************************************************/
     module.controller('listController', function($scope) {
+        // 一覧に表示データの初期設定
         $scope.items = [
             {
                 title : 'お買い物リスト',
@@ -58,6 +74,13 @@ http://codezine.jp/article/detail/8311
                 memo : 'XX銀行の貯金通帳に記入する'
             }
         ];
-    });
+        
+        // イベント受信(changeItem)
+        $scope.$on('changeItems', function() {
+            $scope.$parent.a
+        });
+        
+        
+    }); //listController
     
 }(TodoModule));
