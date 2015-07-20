@@ -10,7 +10,7 @@ and open the template in the editor.
         <meta charset="UTF-8">
         
         <!-- 共通ヘッダ -->
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <script type="text/javascript" src="vendors/jquery-2.1.1.min.js"></script>
         <script type="text/javascript" src="vendors/angular.js"></script>
         <script type="text/javascript" src="vendors/bootstrap/js/bootstrap.min.js"></script>
@@ -24,11 +24,31 @@ and open the template in the editor.
     </head>
     <body ng-app="todoModule" ng-controller="pageController">
         <!-- ヘッダ部分 -->
-        <!-- タスク一覧画面 -->
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <span class="navbar-brand">タスク管理</span>
+                </div>
+            </div>
+        </nav>
+        <!-- タスク一覧画面 -->  
+        <!-- show.listは$scope.show.listにアクセスしているのと同義 -->
+        <!-- ngShow(ng-show)は値に論理値を指定しtrueの場合はその要素を表示 -->
         <div class="container" ng-show="show.list">
+            <!-- メッセージ表示エリア -->
+            <div ng-show="message.show">
+                <div class="alert" role="alert" ng-class="message.type">
+                    <span>{{message.text}}</span>
+                </div>
+            </div>
+            <!-- 一覧表示エリア -->
             <div ng-controller="listController">
+                <div class="alert alert-info" ng-show="items.length < 1">
+                    <span>タスクはありません</span>
+                </div>
                 <div class="list-group">
-                    <a class="list-group-item" ng-repeat="item in items">
+                    <!-- ngRepeat(ng-repeat)は配列形式のデータを繰り返して表示するためのディレクティブ -->
+                    <a class="list-group-item" ng-repeat="item in items" ng-click="show(item)">
                         <div>
                             <h4 class="list-group-item-heading">{{item.title}}</h4>
                             <p class="list-group-item-text">{{item.memo}}</p>
@@ -38,12 +58,36 @@ and open the template in the editor.
             </div>
         </div>
         <!-- タスク追加画面 -->
-        <div ng-show="show.add"></div>
+        <div class="container" ng-show="show.add">
+            <form role="form" name="addItemForm" ng-controller="addController">
+                <div ng-show="!addItemForm.$valid">
+                    <div class="alert alert-warning" role="alert">必須項目を入力してください</div>
+                </div>
+                <div class="form-group">
+                    <label>件名(*)</label>
+                    <input type="text" class="form-control" placeholder="タスク名を入力" required="" ng-model="item.title">
+                </div>
+                <div class="form-group">
+                    <label>メモ(*)</label>
+                    <textarea class="form-control" placeholder="タスク名を入力" ng-model="item.memo"></textarea>
+                </div>
+                <button type="button" class="btn btn-primary btn-block" ng-click="addItem()">追加</button>
+            </form>
+        </div>
         <!-- タスク参照画面 -->
-        <div ng-show="show.info"></div>
+        <div ng-show="show.info">
+            <div>
+                <h1>{{active.title}}</h1>
+                <p>{{active.memo}}</p>
+            </div>
+            <div>
+                <button class="btn btn-warning btn-block" ng-click="deleteItem(active)">削除する</button>
+            </div>
+        </div>
         <!-- フッタ部分 -->
         <nav>
-            <div>
+            <div class="btn-group btn-group-justified">
+                <!-- ngClick(ng-click)クリックイベント発生時の実行すべき処理を定義 -->
                 <a class="btn btn-default" ng-click="changePage('add')">新規</a>
                 <a class="btn btn-default" ng-click="changePage('list')">一覧</a>
             </div>

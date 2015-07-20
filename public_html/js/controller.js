@@ -8,7 +8,7 @@
     'use strict';       // Strictモードを指定
     
     /***************************************************************************
-     *  pageController
+     *  pageController ページ全体制御用コントローラ
      **************************************************************************/
     module.controller('pageController', function($scope) {
        // 表示する要素の管理
@@ -43,7 +43,7 @@
                 text : '削除しました',
                 show : true
             });
-            // rootScopeからのイベント通知
+            // rootScopeからのイベント通知(broadcat = 自分自身から下位の子方向にイベントを通知)
             $scope.$root.$boroadcast('changeItems');
             // 一覧の表示(画面遷移)
             $scope.changePage('list');
@@ -54,13 +54,13 @@
            $scope.message = msg;
            // 3秒後にメッセージを非表示にする
            $timeout(function(){
-               $scope.message = false;
+               $scope.message.show = false;
            }, 3000);
        };
     }); //pageController
 
     /***************************************************************************
-     *  listController
+     *  listController 一覧表示用コントローラ
      **************************************************************************/
     module.controller('listController', function($scope) {
         // 一覧に表示データの初期設定
@@ -77,10 +77,37 @@
         
         // イベント受信(changeItem)
         $scope.$on('changeItems', function() {
-            $scope.$parent.a
+            alert('一覧が更新されました');
         });
         
-        
+        $scope.show = function(item) {
+            $scope.$parent.active = item;
+            $scope.$parent.changePage('info');
+        };
     }); //listController
     
+    /***************************************************************************
+     *  addController TODOアイテム追加用コントローラ
+     **************************************************************************/
+    module.controller('addController', function($scope) {
+        // 追加用のタスクViewモデル
+        $scope.item = {};
+        
+        $scope.addItem = function() {
+            if ($scope.addItemForm.$valid) {
+                alert('入力エラーです');
+                return;
+            }
+            $scope.$parent.showMessage({
+                type : 'alert-info',
+                text : '追加しました',
+                show : true
+            });
+            // イベントを発生させる(一覧更新通知用)
+            $scope.$root.$boroadcast('changeItems');
+            // リスト表示に切り替え
+            $scope.$parent.changePange('list');
+            $scope.item = {};
+        }
+    });
 }(TodoModule));
