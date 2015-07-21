@@ -10,7 +10,8 @@
     /***************************************************************************
      *  pageController ページ全体制御用コントローラ
      **************************************************************************/
-    module.controller('pageController', function($scope) {
+    // タイムアウト処理を実現するため$timeoutを注入できるよう引数に$timeoutを指定
+    module.controller('pageController', function($scope, $timeout) {
        // 表示する要素の管理
        $scope.show = {
            list : true,
@@ -44,7 +45,7 @@
                 show : true
             });
             // rootScopeからのイベント通知(broadcat = 自分自身から下位の子方向にイベントを通知)
-            $scope.$root.$boroadcast('changeItems');
+            $scope.$root.$broadcast('changeItems');
             // 一覧の表示(画面遷移)
             $scope.changePage('list');
        };
@@ -94,7 +95,7 @@
         $scope.item = {};
         
         $scope.addItem = function() {
-            if ($scope.addItemForm.$valid) {
+            if (!$scope.addItemForm.$valid) {
                 alert('入力エラーです');
                 return;
             }
@@ -103,10 +104,10 @@
                 text : '追加しました',
                 show : true
             });
-            // イベントを発生させる(一覧更新通知用)
-            $scope.$root.$boroadcast('changeItems');
+            // イベントを発生させる(一覧更新通知用) 「一覧が更新されました」のアラート表示
+            $scope.$root.$broadcast('changeItems');
             // リスト表示に切り替え
-            $scope.$parent.changePange('list');
+            $scope.$parent.changePage('list');
             $scope.item = {};
         }
     });
