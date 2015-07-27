@@ -11,7 +11,7 @@
      *  pageController ページ全体制御用コントローラ
      **************************************************************************/
     // タイムアウト処理を実現するため$timeoutを注入できるよう引数に$timeoutを指定
-    module.controller('pageController', function($scope, $timeout) {
+    module.controller('pageController', function($scope, $timeout, Items) {
        // 表示する要素の管理
        $scope.show = {
            list : true,
@@ -35,19 +35,23 @@
                    $scope.show[name] = false;
                }
            }
+           if (type === 'info') {
+               var item = Items.getCurrentItem();
+               $scope.active = item;
+           }
        };
        
        // タスクの削除
        $scope.deleteItem = function(item) {
-           $scope.showMessage({
-                type : 'alert-warning',
-                text : '削除しました',
-                show : true
-            });
-            // rootScopeからのイベント通知(broadcat = 自分自身から下位の子方向にイベントを通知)
-            $scope.$root.$broadcast('changeItems');
-            // 一覧の表示(画面遷移)
-            $scope.changePage('list');
+           var item = Items.getCurrentItem();
+           Items.remove(item, function() {
+               $scope.changePage('list');
+               $scope.showMessage({
+                    type : 'alert-warning',
+                    text : '削除しました',
+                    show : true
+                });
+           });
        };
        
        // メッセージ表示
@@ -63,34 +67,32 @@
     /***************************************************************************
      *  listController 一覧表示用コントローラ
      **************************************************************************/
-    module.controller('listController', function($scope) {
-        // 一覧に表示データの初期設定
-        $scope.items = [
-            {
-                title : 'お買い物リスト',
-                memo : '大根と豆腐を買ってくる'
-            },
-            {
-                title : '通帳記入する',
-                memo : 'XX銀行の貯金通帳に記入する'
-            }
-        ];
+    module.controller('listController', function($scope, Items) {
+        $scope.items = [];
+        
+        // 一覧データを取得する
+        Items.list(function(list) {
+            $scope.items = list;
+        });
+
+        $scope.show  = function(item) {
+            Items.setCurrentItem(item);
+            $scope.$parent.changePage('info');
+        };
         
         // イベント受信(changeItem)
         $scope.$on('changeItems', function() {
-            alert('一覧が更新されました');
+            Items.list(function(list) {
+                $scope.items = list;
+            });
         });
         
-        $scope.show = function(item) {
-            $scope.$parent.active = item;
-            $scope.$parent.changePage('info');
-        };
     }); //listController
     
     /***************************************************************************
      *  addController TODOアイテム追加用コントローラ
      **************************************************************************/
-    module.controller('addController', function($scope) {
+    module.controller('addController', function($scope, Items) {
         // 追加用のタスクViewモデル
         $scope.item = {};
         
@@ -99,16 +101,17 @@
                 alert('入力エラーです');
                 return;
             }
-            $scope.$parent.showMessage({
-                type : 'alert-info',
-                text : '追加しました',
-                show : true
+            Items.add($scope.item, function(data) {
+                // 登録された場合には一覧を表示する
+                $scope.$parent.showMessage({
+                    type : 'alert-info',
+                    text : '追加しました',
+                    show : true
+                });
+                // リスト表示に切り替え
+                $scope.$parent.changePage('list');
+                $scope.item = {};
             });
-            // イベントを発生させる(一覧更新通知用) 「一覧が更新されました」のアラート表示
-            $scope.$root.$broadcast('changeItems');
-            // リスト表示に切り替え
-            $scope.$parent.changePage('list');
-            $scope.item = {};
         }
     });
 }(TodoModule));

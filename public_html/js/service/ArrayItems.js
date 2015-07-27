@@ -27,15 +27,46 @@
     };
     
     // 選択中アイテムのsetter
-    p.setCurrentItems = function(item) {
+    p.setCurrentItem = function(item) {
         this.current = item;
     };
     
     // 選択中アイテムのgetter
-    p.getCurrentItems = function() {
+    p.getCurrentItem = function() {
         return this.current;
     };
     
-    実装中。
+    // 一覧取得メソッド(参照)
+    p.list = function(callback) {
+        callback.call(this, this.items);
+    };
+    
+    // アイテム追加メソッド
+    p.add = function(item, callback) {
+        this.serial++;
+        item.id = "id_" + this.serial;
+        var $scope = this.$scope;
+        this.items.push(item);
+        // データが更新されたことを通知(イベント)
+        $scope.$broadcast('changeItems');
+        callback.call(this, item);
+    };
+    
+    // アイテム削除メソッド
+    p.remove = function(item, callback) {
+        var id = item.id;
+        var tmp = new Array();
+        for (var i = 0; i < this.items.length; i++) {
+            if (item.id != this.items[i].id) {
+                tmp.push(this.items[i]);
+            }
+        }
+        this.items = tmp;
+        // rootScopeからのイベント通知(broadcat = 自分自身から下位の子方向にイベントを通知)
+        this.$scope.$broadcast('changeItems');
+        callback.call(this, item);
+    };
+    
+    app.ArrayItems = ArrayItems;
     
 }(this.app));
